@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour
     private Transform _playerTransform;
     private enum EnemyState { Idle, Chase, Attack }
     private EnemyState _currentState = EnemyState.Idle;
+    private HitFeedback _hitFeedback;
 
     private void Start()
     {
@@ -17,6 +18,12 @@ public class Enemy : MonoBehaviour
         if (playerObject != null)
         {
             _playerTransform = playerObject.transform;
+        }
+        
+        _hitFeedback = GetComponent<HitFeedback>();
+        if (_hitFeedback == null)
+        {
+            Debug.LogError("HitFeedback 컴포넌트를 갖고 있지 않아요");
         }
     }
 
@@ -47,6 +54,11 @@ public class Enemy : MonoBehaviour
 
     private void ExecuteStateAction()
     {
+        if (_hitFeedback != null && _hitFeedback.IsStunned)
+        {
+            return; 
+        }
+        
         switch (_currentState)
         {
             case EnemyState.Idle:

@@ -28,6 +28,12 @@ public class Health : MonoBehaviour
         float finalDamage = rawDamage;
     
         if (finalDamage < 0) return;
+        
+        HitFeedback feedback = GetComponent<HitFeedback>();
+        if (feedback != null)
+        {
+            feedback.ApplyFeedback(info);
+        }
     
         _currentHealth -= finalDamage;
     

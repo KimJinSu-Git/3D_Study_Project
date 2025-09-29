@@ -74,9 +74,19 @@ public class PlayerController : MonoBehaviour
         {
             if (Vector3.Distance(transform.position, _destination) > 0.1f)
             {
-                Vector3 direction = (_destination - transform.position).normalized;
-                transform.position += direction * (mMoveSpeed * Time.deltaTime);
-                
+                Vector3 direction = (_destination - transform.position);
+        
+                Vector3 lookDirection = direction;
+                lookDirection.y = 0;
+        
+                if (lookDirection != Vector3.zero)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f); 
+                }
+        
+                transform.position += direction.normalized * (mMoveSpeed * Time.deltaTime);
+        
                 if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1f, mGroundLayer))
                 {
                     transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);

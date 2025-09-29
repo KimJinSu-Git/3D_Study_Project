@@ -1030,6 +1030,7 @@ GameObject:
   - component: {fileID: 1923997631}
   - component: {fileID: 1923997634}
   - component: {fileID: 1923997635}
+  - component: {fileID: 1923997636}
   m_Layer: 9
   m_Name: Enemy
   m_TagString: Untagged
@@ -1154,6 +1155,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mMaxHealth: 500
+--- !u!114 &1923997636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1923997629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67ae34484eddb254cbb36aeb450987e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mHitColor: {r: 1, g: 0, b: 0, a: 1}
+  mColorDuration: 0.1
 --- !u!4 &3040894217413597825
 Transform:
   m_ObjectHideFlags: 0
@@ -1983,6 +1998,7 @@ GameObject:
   - component: {fileID: 3040894217421124940}
   - component: {fileID: 3040894217421124939}
   - component: {fileID: 3040894217421124941}
+  - component: {fileID: 3040894217421124942}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2354,6 +2370,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mMaxHealth: 100
+--- !u!95 &3040894217421124942
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3040894217413822183}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
