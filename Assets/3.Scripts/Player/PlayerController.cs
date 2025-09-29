@@ -127,9 +127,18 @@ public class PlayerController : MonoBehaviour
                 Health targetHealth = target.GetComponent<Health>();
                 if (targetHealth != null)
                 {
-                    targetHealth.TakeDamage(10f * attackData.mDamageMultiplier);
-                    Debug.Log($"{10f * attackData.mDamageMultiplier} 데미지가 들어갔습니다");
-                    // TODO: P1-4 에서 경직/넉백 로직 추가
+                    DamageInfo damage = new DamageInfo
+                    {
+                        BaseDamage = 10f,
+                        DamageMultiplier = attackData.mDamageMultiplier,
+                        StunDuration = attackData.mStunDuration,
+                        KnockbackForce = attackData.mKnockbackForce,
+                        HitDirection = (target.transform.position - transform.position).normalized,
+                        Instigator = gameObject
+                    };
+                    
+                    targetHealth.ApplyDamage(damage);
+                    // TODO: 경직/넉백 로직 추가
                 }
             }
         }

@@ -16,19 +16,34 @@ public class Health : MonoBehaviour
         _currentHealth = mMaxHealth;
     }
     
-    public void TakeDamage(float damage)
+    public void ApplyDamage(DamageInfo info)
     {
-        if (damage < 0) return;
-            
-        _currentHealth -= damage;
-        
-        OnHealthChanged?.Invoke(_currentHealth);
-        
+        float rawDamage = info.BaseDamage * info.DamageMultiplier;
+    
+        // TODO: 방어력/취약/저항 계산 로직 추가
+    
+        // TODO: 치명타 계산 로직 추가
+    
+        // 최종 데미지
+        float finalDamage = rawDamage;
+    
+        if (finalDamage < 0) return;
+    
+        _currentHealth -= finalDamage;
+    
+        // --- 피격 피드백 및 상태 이상 처리 ---
+    
+        // TODO: 경직/넉백 적용 로직 추가
+
         if (_currentHealth <= 0)
         {
             _currentHealth = 0;
             Die();
         }
+    
+        OnHealthChanged?.Invoke(_currentHealth);
+    
+        Debug.Log($"{gameObject.name}가 {finalDamage} 데미지를 입었습니다. 남은 체력 : {_currentHealth}");
     }
     
     public void Heal(float amount)
