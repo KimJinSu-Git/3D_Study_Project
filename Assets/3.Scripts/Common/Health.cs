@@ -5,6 +5,9 @@ public class Health : MonoBehaviour
 {
     [SerializeField] private float mMaxHealth = 100f;
     
+    [Header("UI Feedback")]
+    [SerializeField] private GameObject mDamagePopupPrefab;
+    
     private float _currentHealth;
 
     // 이전의 C# 이벤트인 public static event Action 방식과 다르게 인스펙터에 노출이 가능하다는 UnityAction 사용해봄
@@ -36,6 +39,12 @@ public class Health : MonoBehaviour
         }
     
         _currentHealth -= finalDamage;
+        
+        if (finalDamage > 0 && mDamagePopupPrefab != null)
+        {
+            GameObject popupObject = Instantiate(mDamagePopupPrefab, transform.position + Vector3.up * 1f, Quaternion.identity);
+            popupObject.GetComponent<DamagePopup>()?.Setup(finalDamage);
+        }
     
         // --- 피격 피드백 및 상태 이상 처리 ---
     

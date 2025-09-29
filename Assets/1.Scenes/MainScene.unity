@@ -1155,6 +1155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mMaxHealth: 500
+  mDamagePopupPrefab: {fileID: 2152645692432091511, guid: 434ca2d02a2766843853ab810cb8d14c, type: 3}
 --- !u!114 &1923997636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2370,6 +2371,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mMaxHealth: 100
+  mDamagePopupPrefab: {fileID: 2152645692432091511, guid: 434ca2d02a2766843853ab810cb8d14c, type: 3}
 --- !u!95 &3040894217421124942
 Animator:
   serializedVersion: 7
