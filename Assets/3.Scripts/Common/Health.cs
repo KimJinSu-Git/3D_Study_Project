@@ -31,12 +31,6 @@ public class Health : MonoBehaviour
         float finalDamage = rawDamage;
     
         if (finalDamage < 0) return;
-        
-        HitFeedback feedback = GetComponent<HitFeedback>();
-        if (feedback != null)
-        {
-            feedback.ApplyFeedback(info);
-        }
     
         _currentHealth -= finalDamage;
         
@@ -48,7 +42,20 @@ public class Health : MonoBehaviour
     
         // --- 피격 피드백 및 상태 이상 처리 ---
     
-        // TODO: 경직/넉백 적용 로직 추가
+        HitFeedback feedback = GetComponent<HitFeedback>();
+        if (feedback != null)
+        {
+            feedback.ApplyFeedback(info);
+        }
+        
+        if (info.KnockbackForce > 0)
+        {
+            KnockbackController knockbackController = GetComponent<KnockbackController>();
+            if (knockbackController != null)
+            {
+                knockbackController.ApplyKnockback(info.HitDirection, info.KnockbackForce);
+            }
+        }
 
         if (_currentHealth <= 0)
         {

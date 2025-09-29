@@ -10,20 +10,29 @@ public class Enemy : MonoBehaviour
     private Transform _playerTransform;
     private enum EnemyState { Idle, Chase, Attack }
     private EnemyState _currentState = EnemyState.Idle;
+    
     private HitFeedback _hitFeedback;
+    private KnockbackController _knockbackController;
+    private GameObject _playerObject;
 
     private void Start()
     {
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-        if (playerObject != null)
+        _playerObject = GameObject.FindGameObjectWithTag("Player");
+        _knockbackController = GetComponent<KnockbackController>();
+        
+        if (_playerObject != null)
         {
-            _playerTransform = playerObject.transform;
+            _playerTransform = _playerObject.transform;
         }
         
         _hitFeedback = GetComponent<HitFeedback>();
         if (_hitFeedback == null)
         {
-            Debug.LogError("HitFeedback 컴포넌트를 갖고 있지 않아요");
+            Debug.LogWarning("HitFeedback 컴포넌트를 갖고 있지 않아요");
+        }
+        if (_knockbackController == null)
+        {
+            Debug.LogWarning("KnockbackController 컴포넌트를 갖고 있지 않아요");
         }
     }
 
@@ -54,7 +63,7 @@ public class Enemy : MonoBehaviour
 
     private void ExecuteStateAction()
     {
-        if (_hitFeedback != null && _hitFeedback.IsStunned)
+        if ((_hitFeedback != null && _hitFeedback.IsStunned) || (_knockbackController != null && _knockbackController.IsKnockedBack))
         {
             return; 
         }
@@ -67,7 +76,7 @@ public class Enemy : MonoBehaviour
             case EnemyState.Chase:
                 // 추격 상태, 플레이어를 향해서 이동
                 Vector3 direction = (_playerTransform.position - transform.position).normalized;
-                transform.position += direction * mMoveSpeed * Time.deltaTime;
+                transform.position += direction * (mMoveSpeed * Time.deltaTime);
                 break;
             case EnemyState.Attack:
                 // 공격 상태, 플레이어 공격

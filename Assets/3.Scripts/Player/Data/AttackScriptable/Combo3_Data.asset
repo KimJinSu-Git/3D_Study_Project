@@ -16,4 +16,4 @@ MonoBehaviour:
   mHitRange: 3
   mDamageMultiplier: 1.5
   mStunDuration: 0.5
-  mKnockbackForce: 0
+  mKnockbackForce: 10
