@@ -9,7 +9,9 @@ public class PlayerController : MonoBehaviour
     [Header("Player Movement")]
     [SerializeField] private float mMoveSpeed = 7.0f;
     [SerializeField] private LayerMask mGroundLayer;
-    [SerializeField] private float mRotationLockTime = 0.05f; 
+    
+    [Header("System Settings")]
+    [SerializeField] private float mGravity = -20.0f;
 
     [Header("Player Attack")]
     [SerializeField] private PlayerAttackData[] mComboAttackData;
@@ -22,10 +24,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float mDashStaminaCost = 25f;
     [SerializeField] private float mDashCooldown = 0.5f;
     
+    private CharacterController _characterController;
     private Camera _mainCamera;
     private Vector3 _destination;
-    private float _lastAttackTime;
+    private float _currentVerticalVelocity;
     
+    private float _lastAttackTime;
     private int _currentComboIndex = 0; 
     private float _lastAttackEndTime; 
 
@@ -40,6 +44,7 @@ public class PlayerController : MonoBehaviour
         _mainCamera = Camera.main;
         _health = GetComponent<Health>();
         _stamina = GetComponent<Stamina>();
+        _characterController = GetComponent<CharacterController>();
         
         if (_mainCamera == null || _health == null)
         {
@@ -50,6 +55,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         HandleInput();
+        ApplyGravity();
         MovePlayer();
         UpdateComboState();
     }
@@ -70,7 +76,7 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame && !isStunned)
         {
             TryDash();
-            return; // 대시 입력 시 다른 모든 입력 무시
+            return;
         }
         
         if (Mouse.current.leftButton.wasPressedThisFrame && !isStunned)
@@ -133,7 +139,10 @@ public class PlayerController : MonoBehaviour
             return; 
         }
         
-        if (!_isMoving) { return; }
+        if (!_isMoving)
+        {
+            return;
+        }
         
         Vector3 currentPosXZ = new Vector3(transform.position.x, 0, transform.position.z);
         Vector3 destPosXZ = new Vector3(_destination.x, 0, _destination.z);
@@ -141,26 +150,37 @@ public class PlayerController : MonoBehaviour
         
         if (distanceXZ <= 0.1f)
         {
-            transform.position = new Vector3(_destination.x, transform.position.y, _destination.z);
+            // 앗.. 롤백되는 현상이 플레이어가 문제가 아니라 시네마신 카메라 문제였다니 ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ
             _isMoving = false;
             return;
         }
         
         Vector3 direction = (_destination - transform.position);
+        Vector3 moveDirection = direction.normalized;
+
         Vector3 lookDirection = direction;
         lookDirection.y = 0; 
-        
         if (lookDirection.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f); 
         }
+        
+        Vector3 horizontalMove = new Vector3(moveDirection.x, 0, moveDirection.z) * mMoveSpeed;
+        Vector3 finalMove = horizontalMove + new Vector3(0, _currentVerticalVelocity, 0);
+
+        _characterController.Move(finalMove * Time.deltaTime);
+    }
     
-        transform.position += direction.normalized * (mMoveSpeed * Time.deltaTime);
-    
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1f, mGroundLayer))
+    private void ApplyGravity()
+    {
+        if (_characterController.isGrounded)
         {
-            transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+            _currentVerticalVelocity = -0.5f;
+        }
+        else
+        {
+            _currentVerticalVelocity += mGravity * Time.deltaTime;
         }
     }
     
@@ -194,9 +214,12 @@ public class PlayerController : MonoBehaviour
 
     private void ExecuteAttack(PlayerAttackData attackData, int comboStep)
     {
-        if (_destination != transform.position)
+        Vector3 lookAtTarget = _destination;
+        lookAtTarget.y = transform.position.y;
+    
+        if (lookAtTarget != transform.position)
         {
-            transform.LookAt(_destination);
+            transform.rotation = Quaternion.LookRotation(lookAtTarget - transform.position);
         }
         
         Vector3 attackPosition = transform.position + transform.forward * attackData.mHitRange / 2;
