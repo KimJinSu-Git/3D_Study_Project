@@ -19,6 +19,13 @@ public class Health : MonoBehaviour
         _currentHealth = mMaxHealth;
     }
     
+    public void SetMaxHealth(float newMaxHealth)
+    {
+        mMaxHealth = newMaxHealth;
+        _currentHealth = Mathf.Min(_currentHealth, mMaxHealth);
+        OnHealthChanged?.Invoke(_currentHealth / mMaxHealth);
+    }
+    
     public void ApplyDamage(DamageInfo info)
     {
         float rawDamage = info.BaseDamage * info.DamageMultiplier;

@@ -7,7 +7,6 @@ using UnityEngine.Serialization;
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Movement")]
-    [SerializeField] private float mMoveSpeed = 7.0f;
     [SerializeField] private LayerMask mGroundLayer;
     
     [Header("System Settings")]
@@ -26,15 +25,17 @@ public class PlayerController : MonoBehaviour
     
     private CharacterController _characterController;
     private Camera _mainCamera;
+    private StatSystem _statSystem;
+    private Stamina _stamina;
+    private Health _health;
+    
     private Vector3 _destination;
     private float _currentVerticalVelocity;
     
     private float _lastAttackTime;
     private int _currentComboIndex = 0; 
     private float _lastAttackEndTime; 
-
-    private Stamina _stamina;
-    private Health _health;
+    
     private bool _isDashing = false;
     private bool _isMoving = false;
     private float _lastDashTime;
@@ -45,10 +46,11 @@ public class PlayerController : MonoBehaviour
         _health = GetComponent<Health>();
         _stamina = GetComponent<Stamina>();
         _characterController = GetComponent<CharacterController>();
+        _statSystem = GetComponent<StatSystem>();
         
-        if (_mainCamera == null || _health == null)
+        if (_mainCamera == null || _health == null || _stamina == null || _characterController == null || _statSystem == null)
         {
-            Debug.LogError("카메라 또는 체력 컴포넌트를 찾지 못했습니다.");
+            Debug.LogError("필수 컴포넌트를 찾지 못했습니다.");
         }
     }
     
@@ -150,7 +152,6 @@ public class PlayerController : MonoBehaviour
         
         if (distanceXZ <= 0.1f)
         {
-            // 앗.. 롤백되는 현상이 플레이어가 문제가 아니라 시네마신 카메라 문제였다니 ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ
             _isMoving = false;
             return;
         }
@@ -166,7 +167,9 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f); 
         }
         
-        Vector3 horizontalMove = new Vector3(moveDirection.x, 0, moveDirection.z) * mMoveSpeed;
+        float currentMoveSpeed = _statSystem.FinalStats.MovementSpeed;
+        
+        Vector3 horizontalMove = new Vector3(moveDirection.x, 0, moveDirection.z) * currentMoveSpeed;
         Vector3 finalMove = horizontalMove + new Vector3(0, _currentVerticalVelocity, 0);
 
         _characterController.Move(finalMove * Time.deltaTime);
@@ -232,7 +235,7 @@ public class PlayerController : MonoBehaviour
             {
                 DamageInfo damage = new DamageInfo
                 {
-                    BaseDamage = 10f,
+                    BaseDamage = _statSystem.FinalStats.BaseDamage, 
                     DamageMultiplier = attackData.mDamageMultiplier,
                     StunDuration = attackData.mStunDuration,
                     KnockbackForce = attackData.mKnockbackForce,

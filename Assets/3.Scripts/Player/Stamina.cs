@@ -26,6 +26,13 @@ public class Stamina : MonoBehaviour
     {
         Regenerate();
     }
+    
+    public void SetMaxStamina(float newMaxStamina)
+    {
+        mMaxStamina = newMaxStamina;
+        _currentStamina = Mathf.Min(_currentStamina, mMaxStamina);
+        OnStaminaChanged?.Invoke(_currentStamina / mMaxStamina);
+    }
 
     private void Regenerate()
     {
