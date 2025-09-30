@@ -1144,6 +1144,11 @@ MonoBehaviour:
   mMoveSpeed: 3
   mDetectionRange: 10
   mAttackRange: 1.5
+  mGroundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  mAttackCooldown: 1
+  mAttackDamage: 10
 --- !u!114 &1923997635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2412,7 +2417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f760fcabe2481b847b544a4064040c34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mMaxHealth: 100
+  mMaxHealth: 500
   mDamagePopupPrefab: {fileID: 2152645692432091511, guid: 434ca2d02a2766843853ab810cb8d14c, type: 3}
 --- !u!95 &3040894217421124942
 Animator:
