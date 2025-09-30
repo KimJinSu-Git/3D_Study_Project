@@ -11,11 +11,6 @@ public class PlayerController : MonoBehaviour
     
     [Header("System Settings")]
     [SerializeField] private float mGravity = -20.0f;
-
-    [Header("Player Attack")]
-    [SerializeField] private PlayerAttackData[] mComboAttackData;
-    [SerializeField] private float mComboDelayTime = 0.5f;
-    [SerializeField] private LayerMask mEnemyLayer;
     
     [Header("Evasion Settings")]
     [SerializeField] private float mDashForce = 20f;
@@ -23,11 +18,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float mDashStaminaCost = 25f;
     [SerializeField] private float mDashCooldown = 0.5f;
     
+    [Header("Weapon Mode")]
+    [SerializeField] private float mWeaponSwitchCooldown = 1.0f;
+    
+    public Vector3 CurrentDestination => _destination; 
+    
     private CharacterController _characterController;
     private Camera _mainCamera;
     private StatSystem _statSystem;
     private Stamina _stamina;
     private Health _health;
+    private WeaponHandler _weaponHandler;
     
     private Vector3 _destination;
     private float _currentVerticalVelocity;
@@ -47,6 +48,7 @@ public class PlayerController : MonoBehaviour
         _stamina = GetComponent<Stamina>();
         _characterController = GetComponent<CharacterController>();
         _statSystem = GetComponent<StatSystem>();
+        _weaponHandler = GetComponent<WeaponHandler>();
         
         if (_mainCamera == null || _health == null || _stamina == null || _characterController == null || _statSystem == null)
         {
@@ -59,29 +61,26 @@ public class PlayerController : MonoBehaviour
         HandleInput();
         ApplyGravity();
         MovePlayer();
-        UpdateComboState();
-    }
-
-    private void UpdateComboState()
-    {
-        if (_currentComboIndex > 0 && Time.time > _lastAttackEndTime + mComboDelayTime)
-        {
-            _currentComboIndex = 0;
-        }
     }
 
     private void HandleInput()
     {
-        float currentStunDuration = _currentComboIndex == 0 ? 0 : mComboAttackData[_currentComboIndex - 1].mStunDuration;
-        bool isStunned = Time.time < _lastAttackTime + currentStunDuration;
+        if (_weaponHandler.IsWeaponBusy) return;
+        
+        // 임시적으로 Q 키로 무기 변경 추가
+        if (Keyboard.current.qKey.wasPressedThisFrame)
+        {
+            _weaponHandler.SwitchWeapon();
+            return;
+        }
 
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && !isStunned)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             TryDash();
             return;
         }
         
-        if (Mouse.current.leftButton.wasPressedThisFrame && !isStunned)
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Ray ray = _mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
             RaycastHit hit;
@@ -94,8 +93,10 @@ public class PlayerController : MonoBehaviour
         }
         else if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            TryComboAttack();
+            _weaponHandler.Attack();
         }
+        
+        
     }
     
     private void TryDash()
@@ -136,7 +137,7 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer()
     {
-        if (_isDashing || (_currentComboIndex > 0 && Time.time < _lastAttackEndTime)) 
+        if (_isDashing || _weaponHandler.IsWeaponBusy) 
         {
             return; 
         }
@@ -184,68 +185,6 @@ public class PlayerController : MonoBehaviour
         else
         {
             _currentVerticalVelocity += mGravity * Time.deltaTime;
-        }
-    }
-    
-    private void TryComboAttack()
-    {
-        if (Time.time < _lastAttackEndTime)
-        {
-            return;
-        }
-        
-        if (_currentComboIndex > 0 && Time.time > _lastAttackEndTime + mComboDelayTime)
-        {
-            _currentComboIndex = 0;
-        }
-
-        int nextComboIndex = _currentComboIndex;
-
-        if (nextComboIndex >= mComboAttackData.Length)
-        {
-            nextComboIndex = 0;
-        }
-
-        PlayerAttackData currentAttackData = mComboAttackData[nextComboIndex];
-        ExecuteAttack(currentAttackData, nextComboIndex);
-
-        _currentComboIndex = nextComboIndex + 1;
-        _lastAttackTime = Time.time;
-        
-        _lastAttackEndTime = Time.time + currentAttackData.mStunDuration; 
-    }
-
-    private void ExecuteAttack(PlayerAttackData attackData, int comboStep)
-    {
-        Vector3 lookAtTarget = _destination;
-        lookAtTarget.y = transform.position.y;
-    
-        if (lookAtTarget != transform.position)
-        {
-            transform.rotation = Quaternion.LookRotation(lookAtTarget - transform.position);
-        }
-        
-        Vector3 attackPosition = transform.position + transform.forward * attackData.mHitRange / 2;
-        Collider[] hitTargets = Physics.OverlapSphere(attackPosition, attackData.mHitRange, mEnemyLayer);
-
-        foreach (Collider target in hitTargets)
-        {
-            Health targetHealth = target.GetComponent<Health>();
-            if (targetHealth != null)
-            {
-                DamageInfo damage = new DamageInfo
-                {
-                    BaseDamage = _statSystem.FinalStats.BaseDamage, 
-                    DamageMultiplier = attackData.mDamageMultiplier,
-                    StunDuration = attackData.mStunDuration,
-                    KnockbackForce = attackData.mKnockbackForce,
-                    HitDirection = (target.transform.position - transform.position).normalized,
-                    Instigator = gameObject
-                };
-                
-                targetHealth.ApplyDamage(damage);
-                // TODO: 경직/넉백 로직 추가
-            }
         }
     }
 }
