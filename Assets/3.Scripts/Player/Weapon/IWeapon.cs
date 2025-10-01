@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface IWeapon
 {
-    void Initialize(PlayerController controller, StatSystem statSystem); 
+    void Initialize(PlayerController controller, StatSystem statSystem, Animator animator); 
         
     // 공격
     void TryAttack(float chargeDuration = 0f);

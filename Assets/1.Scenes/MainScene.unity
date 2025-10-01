@@ -1114,12 +1114,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mMaxChargeTime: 2
   mMinChargeTime: 0.5
+  mChargeAnimSpeed: 0.15
   mBaseDamageMultiplier: 1
   mMaxChargeMultiplier: 3
   mAttackCooldown: 1
   mEnemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
 --- !u!1 &1923997629
 GameObject:
   m_ObjectHideFlags: 0
@@ -2507,8 +2508,8 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3040894217413822183}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: fa7f36c71b9e8fa4798df3a931c2fd92, type: 3}
+  m_Controller: {fileID: 9100000, guid: 936e21dad3121394f8a652131ae4c512, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

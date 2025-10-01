@@ -6,6 +6,8 @@ using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
+    private static readonly int MoveSpeed = Animator.StringToHash("MoveSpeed");
+
     [Header("Player Movement")]
     [SerializeField] private LayerMask mGroundLayer;
     
@@ -29,6 +31,7 @@ public class PlayerController : MonoBehaviour
     private Stamina _stamina;
     private Health _health;
     private WeaponHandler _weaponHandler;
+    private Animator _animator;
     
     private Vector3 _destination;
     private float _currentVerticalVelocity;
@@ -49,6 +52,7 @@ public class PlayerController : MonoBehaviour
         _characterController = GetComponent<CharacterController>();
         _statSystem = GetComponent<StatSystem>();
         _weaponHandler = GetComponent<WeaponHandler>();
+        _animator = GetComponent<Animator>();
         
         if (_mainCamera == null || _health == null || _stamina == null || _characterController == null || _statSystem == null)
         {
@@ -144,6 +148,10 @@ public class PlayerController : MonoBehaviour
         
         if (!_isMoving)
         {
+            if (_animator != null)
+            {
+                _animator.SetFloat(MoveSpeed, 0f); 
+            }
             return;
         }
         
@@ -174,6 +182,11 @@ public class PlayerController : MonoBehaviour
         Vector3 finalMove = horizontalMove + new Vector3(0, _currentVerticalVelocity, 0);
 
         _characterController.Move(finalMove * Time.deltaTime);
+        
+        if (_animator != null)
+        {
+            _animator.SetFloat(MoveSpeed, currentMoveSpeed);
+        }
     }
     
     private void ApplyGravity()
@@ -186,5 +199,11 @@ public class PlayerController : MonoBehaviour
         {
             _currentVerticalVelocity += mGravity * Time.deltaTime;
         }
+    }
+    
+    public void StopMovement()
+    {
+        _isMoving = false;
+        _isDashing = false;
     }
 }

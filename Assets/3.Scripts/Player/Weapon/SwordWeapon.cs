@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class SwordWeapon : MonoBehaviour, IWeapon
 {
+    private static readonly int AttackTrigger = Animator.StringToHash("AttackTrigger");
+    private static readonly int ComboIndex = Animator.StringToHash("ComboIndex");
+
     [Header("Weapon Data")]
     [SerializeField] private PlayerAttackData[] mComboAttackData;
     [SerializeField] private float mComboDelayTime = 0.5f;
@@ -10,6 +13,7 @@ public class SwordWeapon : MonoBehaviour, IWeapon
     private PlayerController _playerController;
     private StatSystem _statSystem;
     private Transform _playerTransform;
+    private Animator _animator;
 
     private int _currentComboIndex = 0;
     private float _lastAttackEndTime;
@@ -17,11 +21,12 @@ public class SwordWeapon : MonoBehaviour, IWeapon
 
     public bool IsBusy => _currentComboIndex > 0 && Time.time < _lastAttackEndTime;
 
-    public void Initialize(PlayerController controller, StatSystem statSystem)
+    public void Initialize(PlayerController controller, StatSystem statSystem, Animator animator)
     {
         _playerController = controller;
         _statSystem = statSystem;
         _playerTransform = controller.transform;
+        _animator = animator;
         Debug.Log("SwordWeapon 초기화 완료");
     }
 
@@ -40,6 +45,12 @@ public class SwordWeapon : MonoBehaviour, IWeapon
         if (nextComboIndex >= mComboAttackData.Length)
         {
             nextComboIndex = 0;
+        }
+        
+        if (_animator != null)
+        {
+            _animator.SetInteger(ComboIndex, nextComboIndex + 1);
+            _animator.SetTrigger(AttackTrigger);
         }
 
         PlayerAttackData currentAttackData = mComboAttackData[nextComboIndex];
