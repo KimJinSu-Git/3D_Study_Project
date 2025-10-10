@@ -46,4 +46,13 @@ public class KnockbackController : MonoBehaviour
         _rigidbody.isKinematic = true;
         IsKnockedBack = false;
     }
+    
+    public void StopMovement()
+    {
+        if (_rigidbody != null && !_rigidbody.isKinematic)
+        {
+            _rigidbody.linearVelocity = Vector3.zero;
+            _rigidbody.angularVelocity = Vector3.zero;
+        }
+    }
 }

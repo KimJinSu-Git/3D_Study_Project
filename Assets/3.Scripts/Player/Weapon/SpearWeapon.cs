@@ -55,9 +55,7 @@ public class SpearWeapon : MonoBehaviour, IWeapon
     
         float chargeFactor = Mathf.Clamp01((chargeDuration - mMinChargeTime) / (mMaxChargeTime - mMinChargeTime));
         float finalMultiplier = mBaseDamageMultiplier + chargeFactor * (mMaxChargeMultiplier - mBaseDamageMultiplier);
-    
-        float spearLength = 3.0f;
-        float finalRange = spearLength * (1.0f + chargeFactor * 0.5f);
+        float finalRange = 3.0f * (1.0f + chargeFactor * 0.5f);
     
         Vector3 halfExtents = new Vector3(0.1f, 0.5f, 0.1f);
     
@@ -76,7 +74,6 @@ public class SpearWeapon : MonoBehaviour, IWeapon
         {
             Collider targetCollider = hit.collider;
             if (processedTargets.Contains(targetCollider)) continue;
-
             processedTargets.Add(targetCollider);
 
             Health targetHealth = targetCollider.GetComponent<Health>();
@@ -86,9 +83,10 @@ public class SpearWeapon : MonoBehaviour, IWeapon
                 {
                     BaseDamage = _statSystem.FinalStats.BaseDamage,
                     DamageMultiplier = finalMultiplier,
-                    StunDuration = 0.2f,
-                    KnockbackForce = 5f * chargeFactor,
+                    StunDuration = 0.3f * chargeFactor,
+                    KnockbackForce = 10f * chargeFactor,
                     HitDirection = _playerTransform.forward,
+                    GuardBreakPower = _statSystem.FinalStats.BaseDamage * (0.3f + chargeFactor * 0.2f),
                     Instigator = _playerTransform.gameObject
                 };
 
@@ -96,11 +94,12 @@ public class SpearWeapon : MonoBehaviour, IWeapon
                 Debug.Log($"창 관통 히트: {targetCollider.name} | 배율: {finalMultiplier:F2}");
             }
         }
+        Debug.Log($"창 차지 공격 완료! 관통 적 수: {processedTargets.Count}");
     }
     
     public void StartCharge()
     {
-        if (IsBusy) return;
+        if (_isCharging) return;
     
         _isCharging = true;
         _chargeStartTime = Time.time;
@@ -129,6 +128,5 @@ public class SpearWeapon : MonoBehaviour, IWeapon
         }
 
         ExecuteChargeAttack(chargeDuration);
-        Debug.Log("창 공격 !");
     }
 }

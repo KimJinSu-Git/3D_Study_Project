@@ -79,22 +79,34 @@ public class Enemy : MonoBehaviour
     
     private void OnGuardBrokenHandler()
     {
+        if (_currentState == EnemyState.GuardBroken) return;
+        
         _currentState = EnemyState.GuardBroken;
+        
+        if (_knockbackController != null)
+        {
+            _knockbackController.StopMovement(); // KnockbackController에 정지 메서드 추가 예정
+        }
+        
         // TODO: 몬스터 무력화 애니메이션 재생 추가
     
         // 일정 시간 후 무력화 해제 코루틴 시작
-        StartCoroutine(RecoverFromGuardBreak(1.5f)); 
+        StartCoroutine(RecoverFromGuardBreak(3.0f)); 
     }
     
     private IEnumerator RecoverFromGuardBreak(float duration)
     {
+        Debug.Log($"{gameObject.name} 무력화 시작.");
+        
         yield return new WaitForSeconds(duration);
     
         // 회복 후 Idle 상태로 복귀
         _currentState = EnemyState.Idle; 
     
         // 몬스터의 브레이크 수치를 다시 Max로 설정해야 함
-        // TODO: _health.ResetGuardBreak(); 호출
+        _health.ResetGuardBreak();
+        
+        Debug.Log($"{gameObject.name} 무력화 회복. 전투 재개.");
     }
 
     private void ExecuteStateAction()

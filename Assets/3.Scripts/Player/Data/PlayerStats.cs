@@ -17,7 +17,7 @@ public struct PlayerStats
         return new PlayerStats
         {
             BaseDamage = 10f,
-            MaxHealth = 100f,
+            MaxHealth = 1000f,
             MaxStamina = 100f,
             AttackSpeed = 1.0f,
             CriticalChance = 0.05f,

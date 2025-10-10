@@ -11,11 +11,8 @@ public class Health : MonoBehaviour
     
     [Header("Guard Break")]
     [SerializeField] private float mMaxGuardBreakValue = 100f; // 최대 무력화
-    [SerializeField] private float mBreakRegenRate = 5f; // 무력화 리젠율(필요 시) TODO:: 리젠이 필요하지 않다면 0으로 하자. 이건 고민 좀.
-    [SerializeField] private float mBreakRegenDelay = 3f; // TODO :: 무력화 리젠에 필요한 딜레이 시간
 
     private float _currentGuardBreakValue;
-    private float _lastBreakHitTime;
     
     private float _currentHealth;
 
@@ -29,26 +26,12 @@ public class Health : MonoBehaviour
         _currentHealth = mMaxHealth;
         _currentGuardBreakValue = mMaxGuardBreakValue;
     }
-
-    private void Update()
-    {
-        RegenerateGuardBreak();
-    }
     
-    private void RegenerateGuardBreak()
+    public void ResetGuardBreak()
     {
-        if (Time.time < _lastBreakHitTime + mBreakRegenDelay)
-        {
-            return;
-        }
-
-        if (_currentGuardBreakValue < mMaxGuardBreakValue)
-        {
-            _currentGuardBreakValue += mBreakRegenRate * Time.deltaTime;
-            _currentGuardBreakValue = Mathf.Min(_currentGuardBreakValue, mMaxGuardBreakValue);
-        
-            // TODO: UI에 브레이크 게이지 업데이트 알림
-        }
+        _currentGuardBreakValue = mMaxGuardBreakValue;
+        // TODO: UI에 브레이크 게이지 Max로 복구 알림
+        Debug.Log($"{gameObject.name}의 가드 브레이크 수치 초기화됨.");
     }
     
     public void ApplyGuardBreak(float power)
@@ -56,7 +39,6 @@ public class Health : MonoBehaviour
         if (_currentGuardBreakValue <= 0 || power <= 0) return;
     
         _currentGuardBreakValue -= power;
-        _lastBreakHitTime = Time.time; // 재생 타이머 갱신
 
         if (_currentGuardBreakValue <= 0)
         {
