@@ -23,7 +23,7 @@ public class Enemy : MonoBehaviour
     private float _lastAttackTime;
     private Coroutine _attackCoroutine;
     
-    private enum EnemyState { Idle, Chase, Attack }
+    private enum EnemyState { Idle, Chase, Attack, GuardBroken }
     private EnemyState _currentState = EnemyState.Idle;
 
     private void Start()
@@ -45,6 +45,7 @@ public class Enemy : MonoBehaviour
         if (_playerHealth == null) { Debug.LogWarning("Player가 Health 컴포넌트를 갖고 있지 않아요"); }
         
         _health.OnDied += OnDied;
+        _health.OnGuardBroken += OnGuardBrokenHandler;
     }
 
     private void Update()
@@ -75,9 +76,31 @@ public class Enemy : MonoBehaviour
             transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
         }
     }
+    
+    private void OnGuardBrokenHandler()
+    {
+        _currentState = EnemyState.GuardBroken;
+        // TODO: 몬스터 무력화 애니메이션 재생 추가
+    
+        // 일정 시간 후 무력화 해제 코루틴 시작
+        StartCoroutine(RecoverFromGuardBreak(1.5f)); 
+    }
+    
+    private IEnumerator RecoverFromGuardBreak(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+    
+        // 회복 후 Idle 상태로 복귀
+        _currentState = EnemyState.Idle; 
+    
+        // 몬스터의 브레이크 수치를 다시 Max로 설정해야 함
+        // TODO: _health.ResetGuardBreak(); 호출
+    }
 
     private void ExecuteStateAction()
     {
+        if ((_hitFeedback != null && _hitFeedback.IsStunned) || (_knockbackController != null && _knockbackController.IsKnockedBack)) { return; }
+        
         switch (_currentState)
         {
             case EnemyState.Idle:
@@ -96,6 +119,9 @@ public class Enemy : MonoBehaviour
                 {
                     _attackCoroutine = StartCoroutine(AttackSequence());
                 }
+                break;
+            case EnemyState.GuardBroken:
+                // 무력화 상태. 아무 행동도 취하지 않고 애니메이션만 취하고 행동 변환
                 break;
         }
     }

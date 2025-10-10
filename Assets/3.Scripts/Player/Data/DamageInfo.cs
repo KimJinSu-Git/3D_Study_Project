@@ -15,6 +15,8 @@ public struct DamageInfo
     public float KnockbackForce;   // 넉백 힘
     public Vector3 HitDirection;   // 피격 방향 (넉백 계산에 사용)
     
+    public float GuardBreakPower; // 무력화 수치 (추가 예정)
+    
     public bool IsCritical;
     public GameObject Instigator;  // 공격 주체 (장판기 같은 경우 본인이 맞으면 안 되니 추가 요소)
 }

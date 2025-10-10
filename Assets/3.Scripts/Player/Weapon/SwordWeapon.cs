@@ -81,6 +81,7 @@ public class SwordWeapon : MonoBehaviour, IWeapon
                 {
                     BaseDamage = _statSystem.FinalStats.BaseDamage,
                     DamageMultiplier = attackData.mDamageMultiplier,
+                    GuardBreakPower = _statSystem.FinalStats.BaseDamage * 0.1f, // 검의 기본 공격력의 0.1f만큼 무력화 수치를 전달 추가
                     StunDuration = attackData.mStunDuration,
                     KnockbackForce = attackData.mKnockbackForce,
                     HitDirection = (target.transform.position - _playerTransform.position).normalized,
