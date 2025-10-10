@@ -65,10 +65,27 @@ public class Health : MonoBehaviour
     
         // 최종 데미지
         float finalDamage = rawDamage;
-    
+        float finalBreakPower = info.GuardBreakPower;
+        
+        ShieldLogic shieldLogic = GetComponent<ShieldLogic>();
+        if (shieldLogic != null)
+        {
+            // ShieldLogic에게 최종 피해 배율을 요청
+            float guardMultiplier = shieldLogic.GetDamageMultiplier(info, transform);
+        
+            finalDamage *= guardMultiplier;
+            finalBreakPower *= guardMultiplier;
+        
+            if (guardMultiplier < 1.0f)
+            {
+                Debug.Log($"가드 성공! 피해 및 브레이크 수치 {100f - (guardMultiplier * 100f)}% 감소.");
+            }
+        }
+        
         if (finalDamage < 0) return;
     
         _currentHealth -= finalDamage;
+        ApplyGuardBreak(info.GuardBreakPower);
         
         if (finalDamage > 0 && mDamagePopupPrefab != null)
         {
@@ -92,8 +109,6 @@ public class Health : MonoBehaviour
                 knockbackController.ApplyKnockback(info.HitDirection, info.KnockbackForce);
             }
         }
-        
-        ApplyGuardBreak(info.GuardBreakPower);
 
         if (_currentHealth <= 0)
         {
