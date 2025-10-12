@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected float mMoveSpeed = 3.0f;
     [SerializeField] protected float mDetectionRange = 10.0f;
     [SerializeField] protected float mAttackRange = 1.5f;
-    [SerializeField] protected float mAttackCooldown = 1.0f;
+    [SerializeField] protected float mAttackCooldown;
     [SerializeField] protected float mAttackDamage = 10.0f;
     [SerializeField] protected LayerMask mGroundLayer;
     
@@ -23,7 +23,7 @@ public class Enemy : MonoBehaviour
     protected float _lastAttackTime;
     protected Coroutine _attackCoroutine;
 
-    public enum EnemyState { Idle, Chase, Attack, Guard, GuardBroken }
+    public enum EnemyState { Idle, Chase, Attack, Guard, GuardBroken, CoolDown  }
     protected EnemyState _currentState = EnemyState.Idle;
     
     protected bool _isVulnerable = false; 

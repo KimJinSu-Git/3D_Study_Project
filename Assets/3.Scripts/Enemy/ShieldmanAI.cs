@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class ShieldmanAI : Enemy 
 {
+    [Header("Shieldman AI Parameters")]
+    [SerializeField] private float mGuardDuration = 3.0f;
+    
     private ShieldLogic _shieldLogic;
     private Coroutine _attackStanceCoroutine;
     private Coroutine _guardStanceCoroutine;
@@ -84,6 +87,9 @@ public class ShieldmanAI : Enemy
             case EnemyState.Idle:
                 // Idle 로직
                 break;
+            case EnemyState.CoolDown:
+                // 아무것도 하지 않고 대기합니다.
+                break; 
             case EnemyState.GuardBroken:
                 // 무력화 상태
                 break;
@@ -92,9 +98,18 @@ public class ShieldmanAI : Enemy
 
     private IEnumerator AttackStanceRoutine()
     {
-        Debug.Log("실드맨이 플레이어 공격 했어요");
+        Debug.Log($"{gameObject.name} 반격 시작.");
+        
+        transform.LookAt(new Vector3(_playerTransform.position.x, transform.position.y, _playerTransform.position.z));
+        
+        // TODO: 애니메이션 컴포넌트를 사용하여 반격 애니메이션 트리거
         
         yield return new WaitForSeconds(2f);
+        
+        _currentState = EnemyState.CoolDown;
+        Debug.Log($"{gameObject.name} 공격 완료. 쿨타임 시작.");
+        
+        yield return new WaitForSeconds(mAttackCooldown); 
         
         _currentState = EnemyState.Idle; 
         _attackStanceCoroutine = null;
@@ -102,9 +117,13 @@ public class ShieldmanAI : Enemy
     
     private IEnumerator GuardStanceRoutine()
     {
-        yield return new WaitForSeconds(3.0f);
+        Debug.Log($"{gameObject.name} 가드 자세 시작. {mGuardDuration}초 후 반격 준비.");
+        yield return new WaitForSeconds(mGuardDuration);
 
-        _shieldLogic.EndGuard();
+        if (_shieldLogic != null)
+        {
+            _shieldLogic.EndGuard();
+        }
         _currentState = EnemyState.Attack;
         _guardStanceCoroutine = null;
     }
