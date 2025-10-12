@@ -11,6 +11,9 @@ public class Health : MonoBehaviour
     
     [Header("Guard Break")]
     [SerializeField] private float mMaxGuardBreakValue = 100f; // 최대 무력화
+    
+    [Header("Vulnerability Settings")]
+    [SerializeField] private float mVulnerableDamageMultiplier = 2.0f;
 
     private float _currentGuardBreakValue;
     
@@ -63,7 +66,6 @@ public class Health : MonoBehaviour
     
         // TODO: 치명타 계산 로직 추가
     
-        // 최종 데미지
         float finalDamage = rawDamage;
         float finalBreakPower = info.GuardBreakPower;
         
@@ -83,6 +85,14 @@ public class Health : MonoBehaviour
         }
         
         if (finalDamage < 0) return;
+        
+        Enemy enemy = GetComponent<Enemy>();
+        if (enemy != null && enemy.IsVulnerable)
+        {
+            finalDamage *= mVulnerableDamageMultiplier;
+            finalBreakPower *= mVulnerableDamageMultiplier;
+            Debug.Log("무력화! 피해 증폭.");
+        }
     
         _currentHealth -= finalDamage;
         ApplyGuardBreak(info.GuardBreakPower);

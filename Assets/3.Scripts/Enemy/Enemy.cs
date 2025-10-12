@@ -26,6 +26,9 @@ public class Enemy : MonoBehaviour
     public enum EnemyState { Idle, Chase, Attack, Guard, GuardBroken }
     protected EnemyState _currentState = EnemyState.Idle;
     
+    protected bool _isVulnerable = false; 
+    public bool IsVulnerable => _isVulnerable;
+    
     public EnemyState CurrentState => _currentState;
     public Transform PlayerTransform => _playerTransform;
 
@@ -57,6 +60,7 @@ public class Enemy : MonoBehaviour
         if (_currentState == EnemyState.GuardBroken) return;
         
         _currentState = EnemyState.GuardBroken;
+        _isVulnerable = true;
         
         if (_knockbackController != null)
         {
@@ -76,7 +80,7 @@ public class Enemy : MonoBehaviour
         yield return new WaitForSeconds(duration);
     
         _currentState = EnemyState.Idle; 
-    
+        _isVulnerable = false;
         _health.ResetGuardBreak();
         
         Debug.Log($"{gameObject.name} 무력화 회복. 전투 재개.");
