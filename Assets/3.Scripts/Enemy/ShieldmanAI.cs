@@ -22,7 +22,7 @@ public class ShieldmanAI : Enemy
     {
         if (_playerTransform == null || _playerHealth == null) return;
         
-        Debug.Log($"{_currentState}");
+        Debug.Log($"{gameObject.name} 상태 : {_currentState}");
         
         if ((_hitFeedback != null && _hitFeedback.IsStunned) || (_knockbackController != null && _knockbackController.IsKnockedBack) || 
             (_currentState == EnemyState.GuardBroken)) 
