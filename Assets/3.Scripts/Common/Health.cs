@@ -23,6 +23,10 @@ public class Health : MonoBehaviour
     public UnityAction<float> OnHealthChanged;
     public UnityAction OnDied;
     public UnityAction OnGuardBroken; // 가드 파괴 시 나중에 할 행동
+    public UnityAction<float> OnGuardBreakChanged;
+    
+    public float MaxHealth => mMaxHealth;
+    public float MaxGuardBreakValue => mMaxGuardBreakValue;
     
     private void Awake()
     {
@@ -34,6 +38,7 @@ public class Health : MonoBehaviour
     {
         _currentGuardBreakValue = mMaxGuardBreakValue;
         // TODO: UI에 브레이크 게이지 Max로 복구 알림
+        OnGuardBreakChanged?.Invoke(_currentGuardBreakValue);
         Debug.Log($"{gameObject.name}의 가드 브레이크 수치 초기화됨.");
     }
     
@@ -42,10 +47,12 @@ public class Health : MonoBehaviour
         if (_currentGuardBreakValue <= 0 || power <= 0) return;
     
         _currentGuardBreakValue -= power;
+        _currentGuardBreakValue = Mathf.Max(_currentGuardBreakValue, 0);
 
+        OnGuardBreakChanged?.Invoke(_currentGuardBreakValue);
+        
         if (_currentGuardBreakValue <= 0)
         {
-            _currentGuardBreakValue = 0;
             OnGuardBroken?.Invoke(); // 무력화 이벤트 발생
             Debug.Log($"{gameObject.name}의 무력화 발생!");
         }

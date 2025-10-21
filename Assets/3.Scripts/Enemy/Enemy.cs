@@ -11,6 +11,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected float mAttackCooldown;
     [SerializeField] protected float mAttackDamage = 10.0f;
     [SerializeField] protected LayerMask mGroundLayer;
+    [SerializeField] protected bool mIsBoss = false;
     
     protected Health _health;
     protected HitFeedback _hitFeedback;
@@ -28,6 +29,7 @@ public class Enemy : MonoBehaviour
     
     protected bool _isVulnerable = false; 
     public bool IsVulnerable => _isVulnerable;
+    public bool IsBoss => mIsBoss;
     
     public EnemyState CurrentState => _currentState;
     public Transform PlayerTransform => _playerTransform;
