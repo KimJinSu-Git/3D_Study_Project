@@ -1,6 +1,9 @@
 using System;
 using UnityEngine;
 
+/// <summary>
+/// PlayerStats ::: 플레이어의 최종 능력치 결과를 저장하는 '그릇' 역할
+/// </summary>
 [Serializable]
 public struct PlayerStats
 {
